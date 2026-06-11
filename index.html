@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Block Blast: English Quest - Game Học Tiếng Anh Cực Hay</title>
+  <meta name="description" content="Trải nghiệm game xếp gạch Block Blast độc đáo kết hợp học từ vựng tiếng Anh. Thử thách bản thân xếp khối, nổ chữ cái và hoàn thành nhiệm vụ từ vựng!">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="game-container">
+    <!-- Header -->
+    <header>
+      <div class="logo">BLOCK BLAST</div>
+      <div class="header-controls">
+        <button id="btn-sound" class="btn-icon" title="Bật/Tắt âm thanh" aria-label="Toggle Sound">🔊</button>
+        <button id="btn-category-select" class="btn-icon" title="Chọn chủ đề từ vựng" aria-label="Select Category">📚</button>
+        <button id="btn-restart" class="btn-icon" title="Chơi lại từ đầu" aria-label="Restart Game">🔄</button>
+      </div>
+    </header>
+
+    <!-- Dashboard thông tin màn chơi và nhiệm vụ từ vựng -->
+    <div class="dashboard">
+      <div class="quest-header">
+        <span id="current-category" class="category-badge">Đang tải...</span>
+        <div class="score-panel">
+          <div class="score-item">
+            <span class="score-label">Điểm</span>
+            <span id="score-val" class="score-value">0</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Cao nhất</span>
+            <span id="best-score-val" class="score-value">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nhiệm vụ ghép chữ cái -->
+      <div class="quest-box">
+        <span class="quest-prompt">Nhiệm vụ: Hãy blast các chữ cái để ghép thành:</span>
+        <div id="quest-vn-meaning" class="vietnamese-translation">Đang tải...</div>
+        <div id="quest-word-slots" class="quest-word">
+          <!-- Các ô chữ cái của từ nhiệm vụ sẽ được tạo động ở đây -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Bàn cờ chính 8x8 -->
+    <div class="board-container" id="board-container">
+      <div class="grid" id="grid">
+        <!-- 64 ô cờ được sinh bằng JS -->
+      </div>
+    </div>
+
+    <!-- Khay chứa 3 khối gạch tiếp theo -->
+    <div class="blocks-rack" id="blocks-rack">
+      <div class="rack-slot" id="rack-slot-0"></div>
+      <div class="rack-slot" id="rack-slot-1"></div>
+      <div class="rack-slot" id="rack-slot-2"></div>
+    </div>
+  </div>
+
+  <!-- Dialog 1: Màn hình bắt đầu game & chọn chủ đề -->
+  <dialog id="start-dialog">
+    <div class="modal-content">
+      <h2 class="modal-title">ENGLISH QUEST</h2>
+      <p class="modal-subtitle">Xếp gạch Block Blast & Học từ vựng Tiếng Anh</p>
+      
+      <div class="instructions-card">
+        <h4>Cách chơi:</h4>
+        <ul>
+          <li>Kéo thả các khối gạch chứa chữ cái vào lưới 8x8.</li>
+          <li>Xếp đầy hàng hoặc cột để <strong>Blast (nổ)</strong> và ghi điểm.</li>
+          <li>Nếu tạo ra một từ tiếng Anh có nghĩa theo hàng ngang/dọc, từ đó sẽ tự động nổ!</li>
+          <li><strong>Mục tiêu:</strong> Thu thập các chữ cái bằng cách làm nổ chúng để ghép thành từ nhiệm vụ!</li>
+        </ul>
+      </div>
+
+      <p style="font-weight: 600; margin-top: 5px; font-size: 0.9rem;">Chọn chủ đề từ vựng:</p>
+      <div class="category-select-list" id="start-category-list">
+        <!-- Các chủ đề được tạo động ở đây -->
+      </div>
+
+      <button id="btn-start-game" class="btn-primary">Bắt đầu chơi</button>
+    </div>
+  </dialog>
+
+  <!-- Dialog 2: Chi tiết từ vựng (Flashcard khi ghép thành công) -->
+  <dialog id="word-detail-dialog">
+    <div class="modal-content">
+      <span style="font-size: 2.5rem;">🎉</span>
+      <h3 class="modal-title" style="color: var(--neon-lime);">TỪ VỰNG MỚI!</h3>
+      
+      <div class="word-flashcard">
+        <div id="card-en-word" class="word-spelled-large">APPLE</div>
+        <div id="card-ipa" class="word-phonetic">/ˈæp.əl/</div>
+        <button id="card-speech-btn" class="word-speaker-btn" title="Nghe phát âm">🔊</button>
+        <div id="card-vn-meaning" class="word-meaning">Quả táo</div>
+        
+        <div style="text-align: left; margin-top: 5px;">
+          <p style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Ví dụ:</p>
+          <p id="card-example-en" class="word-example">"An apple a day keeps the doctor away."</p>
+          <p id="card-example-vn" class="word-example-translation">Mỗi ngày một quả táo giúp bạn tránh xa bác sĩ.</p>
+        </div>
+      </div>
+
+      <button id="btn-close-word-detail" class="btn-primary">Tiếp tục chơi</button>
+    </div>
+  </dialog>
+
+  <!-- Dialog 3: Game Over -->
+  <dialog id="game-over-dialog">
+    <div class="modal-content">
+      <span style="font-size: 3rem;">👾</span>
+      <h2 class="modal-title" style="color: var(--neon-pink);">GAME OVER</h2>
+      <p class="modal-subtitle">Không còn vị trí hợp lệ để đặt khối gạch!</p>
+
+      <div class="stats-summary">
+        <div class="stat-box">
+          <span id="game-over-score" class="stat-val">0</span>
+          <span class="stat-label">Điểm số</span>
+        </div>
+        <div class="stat-box">
+          <span id="game-over-words" class="stat-val">0</span>
+          <span class="stat-label">Từ đã ghép</span>
+        </div>
+      </div>
+
+      <button id="btn-restart-game" class="btn-primary" style="background: linear-gradient(135deg, #ff0055, #b026ff); box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);">Chơi lại</button>
+    </div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
